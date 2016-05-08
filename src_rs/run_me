@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BOOST_DIR=/home/nilmini/programs/boost_1_53_0
+
+export BOOSTINC=$BOOST_DIR
+export BOOSTLIB=$BOOST_DIR/stage/lib
+export LD_LIBRARY_PATH=$BOOST_DIR/stage/lib/
+
+#compile
+g++ -c -Wall -std=c++0x -O2 -g -I/home/nilmini/programs/boost_1_53_0/ -I../ezpwd-reed-solomon-master/c++/ rs_test.cpp -o rs_test.o
+#link
+g++ rs_test.o -L/home/nilmini/programs/boost_1_53_0/stage/lib -lboost_program_options -o rs_test.exe

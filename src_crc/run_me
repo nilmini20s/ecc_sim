@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BOOST_DIR=/home/nilmini/programs/boost_1_53_0
+
+export BOOSTINC=$BOOST_DIR
+export BOOSTLIB=$BOOST_DIR/stage/lib
+export LD_LIBRARY_PATH=$BOOST_DIR/stage/lib/
+
+#compile
+g++ -c -Wall -std=c++0x -O2 -g -I/home/nilmini/programs/boost_1_53_0/ crc32.cpp -o crc32.o
+#link
+g++ crc32.o -L/home/nilmini/programs/boost_1_53_0/stage/lib -lboost_program_options -o crc32.exe

@@ -1,0 +1,49 @@
+8_bit
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+16_bit
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+32_bit
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+8_word
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+16_word
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+32_word
+Total simulations: 100000000
+Num successfully detected faults: 100000000
+Num faults failed to detect: 0
+
+8_rank
+Total simulations: 100000000
+Num successfully detected faults: 95385640
+Num faults failed to detect: 4614360
+
+16_rank
+Total simulations: 100000000
+Num successfully detected faults: 99925836
+Num faults failed to detect: 74164
+
+32_rank
+Total simulations: 100000000
+Num successfully detected faults: 99949097
+Num faults failed to detect: 50903
+
+64_rank
+Total simulations: 100000000
+Num successfully detected faults: 99673342
+Num faults failed to detect: 326658
