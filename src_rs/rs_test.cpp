@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <omp.h>
 #include <assert.h>
 #include <math.h>
 #include <algorithm> // to get std::for_each
@@ -12,6 +13,7 @@
 typedef boost::mt19937_64   ENG; //Mersenne Twister
 ENG eng; // define the generator once. 
 
+#define MAX_THREADS 32 // max parallel threads
 #define MAX_MX_LEN 72 // maximum message size is 512b or 64B + parity symbols
 #define DRAM_1BIT 0
 #define DRAM_1WORD 1
@@ -87,9 +89,12 @@ bool createFaultyBits(unsigned char message_buffer[], int m_len, int fail_type)
         message_buffer[random % m_len] <<= 0x1;
         definite_difference = (before == message_buffer[random % m_len]) ? false:true;
     } else if (fail_type == DRAM_1RANK) {
-        // rank failure, mess up all the bits (by shifting all the bits up by 1)
+        unsigned char before[m_len];
+        memcpy(before, message_buffer, m_len);
+        // rank failure, mess up all the bytes (i.e. symbols)
         for (int i = 0; i < m_len; i++)
-            message_buffer[i] <<= 0x1;
+            message_buffer[(random+i) % m_len] <<= 0x1;
+        definite_difference = memcmp(before, message_buffer, m_len) ? true:false;
     }
 
     return definite_difference;
@@ -130,7 +135,6 @@ int oneSim()
     // decode the codeword.
     int count = rs.decode(mx_vec); // Correct any symbols possible
     if (DEBUG) { printf("Restored  : "); printMessage_vector(mx_vec); }
-    if (DEBUG) { printf("faulty = %d, count = %d\n", faulty, count); }
 
     // discard the parity symbols
     mx_vec.resize(mx_vec.size() - rs.nroots());
@@ -141,6 +145,7 @@ int oneSim()
 
     // compare the restored value with the original value
     bool isequal = memcmp(orig, mx, mx_len);
+    if (DEBUG) { printf("faulty %d, count %2d, isequal %d\n", faulty, count, !isequal); }
 
     // if count == -1, an error was detected, but not corrected
     // if count > 0, that many symbols were corrected
@@ -155,25 +160,35 @@ int oneSim()
 
 int main()
 {
-    long int total_sims = 1e6;
-    int num_successes = 0; 
-    int num_fails = 0;
+    long int total_sims = 1e7;
+    int num_successes[MAX_THREADS] = {0}; 
+    int num_fails[MAX_THREADS] = {0};
 
     // initialize random seed
     srand (time(NULL));
 
     // run Monte Carlo simulations
+#pragma omp parallel
+{
+    int id=omp_get_thread_num();
+#pragma omp for
     for (long int i = 0; i < total_sims; i++)
     {
+        //printf("sim: %ld\n", i);
         if (oneSim() == 1)
-            num_successes++;
+            num_successes[id]++;
         else
-            num_fails++;
-    }
+            num_fails[id]++;
+    } 
+}
+
+    int total_successes=0, total_fails=0;
+    for (int i=0; i < MAX_THREADS; i++) total_successes+=num_successes[i];
+    for (int i=0; i < MAX_THREADS; i++) total_fails+=num_fails[i];
 
     printf("Total simulations: %ld\n", total_sims);
-    printf("Num successfully detected faults: %d\n", num_successes);
-    printf("Num faults failed to detect: %d\n", num_fails);
+    printf("Num successfully detected faults: %d\n", total_successes);
+    printf("Num faults failed to detect: %d\n", total_fails);
 
     return 0;
 }
