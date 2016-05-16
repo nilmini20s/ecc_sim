@@ -1044,11 +1044,16 @@ namespace ezpwd {
 	    int			deg_omega = 0;
 	    int			r	= no_eras;
 	    int			el	= no_eras;
-	    if ( ! syn_error ) {
+	    if ( syn_error==0 ) {
 		// if syndrome is zero, data[] is a codeword and there are no errors to correct.
 		count			= 0;
 		goto finish;
-	    }
+	    } else {
+        // Nilmini: we are adding this clause here because we only
+        //want to know "error" or "no-error", we don't care about correction
+		count			= -3;
+		goto finish;
+        }
 
 	    lambda[0] 			= 1;
 	    if ( no_eras > 0 ) {
@@ -1166,6 +1171,7 @@ namespace ezpwd {
 		if ( lambda[i] != NN )
 		    deg_lambda		= i;
 	    }
+		    //std::cout << "deg_lambda = " << deg_lambda  << std::endl;
 	    // Find roots of error+erasure locator polynomial by Chien search
 	    reg				= lambda;
 	    count			= 0; // Number of roots of lambda(x)
@@ -1191,7 +1197,7 @@ namespace ezpwd {
 	    }
 	    if ( deg_lambda != count ) {
 		// deg(lambda) unequal to number of roots => uncorrectable error detected
-		count			= -1;
+		count			= -2;
 		goto finish;
 	    }
 	    //

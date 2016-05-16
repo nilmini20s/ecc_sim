@@ -150,9 +150,17 @@ int oneSim()
     // if count == -1, an error was detected, but not corrected
     // if count > 0, that many symbols were corrected
     // if count == 0, no symbols were found to be corrupted
-    if ((count < 0) || !faulty)
+    if (!faulty)
+        // no faults were injected, so we can disregard this case
         return 1;
-    if ((count > 0) && !isequal)
+    else if (count == 0)
+        // faults were injected, but not detected
+        return 0; 
+    else if (count < 0)
+        // faults were injected, and detected
+        return 1;
+    else if ((count > 0) && !isequal)
+        // faults were injected, detected, and corrected
         return 1;
 
     return 0;
@@ -160,7 +168,7 @@ int oneSim()
 
 int main()
 {
-    long int total_sims = 1e7;
+    long int total_sims = 1e8;
     int num_successes[MAX_THREADS] = {0}; 
     int num_fails[MAX_THREADS] = {0};
 
