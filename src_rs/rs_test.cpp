@@ -93,7 +93,7 @@ bool createFaultyBits(unsigned char message_buffer[], int m_len, int fail_type)
         memcpy(before, message_buffer, m_len);
         // rank failure, mess up all the bytes (i.e. symbols)
         for (int i = 0; i < m_len; i++)
-            message_buffer[(random+i) % m_len] <<= 0x1;
+            message_buffer[(random+i) % m_len] ^= ((random+i) % 0xff);
         definite_difference = memcmp(before, message_buffer, m_len) ? true:false;
     }
 
